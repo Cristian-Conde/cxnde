@@ -1,137 +1,224 @@
-# cxnde
+import tkinter as tk
+from tkinter import messagebox
+import random
 
-# Clase base Personaje
+# ------------------ Clases de Personajes ------------------
+
 class Personaje:
     def __init__(self, nombre, vida, ataque, defensa):
-        self.nombre = nombre  # Nombre del personaje
+        self.nombre = nombre
         self.__vida = vida
         self.__ataque = ataque
         self.__defensa = defensa
-    
+
     @property
     def vida(self):
         return self.__vida
 
     @vida.setter
     def vida(self, valor):
-        if 0 <= valor <= 100:
-            self.__vida = valor
-        else:
-            raise ValueError("La vida debe estar entre 0 y 100.")
-    
+        self.__vida = max(0, min(valor, 100))
+
     @property
     def ataque(self):
         return self.__ataque
-    
+
     @property
     def defensa(self):
         return self.__defensa
 
     def atacar(self, objetivo):
-        pass
+        dano = self.calcular_dano(objetivo)
+        objetivo.recibir_dano(dano)
+        return f"{self.nombre} ataca a {objetivo.nombre} con {dano:.2f} de daño. Vida restante: {objetivo.vida:.2f}"
+
+    def calcular_dano(self, objetivo):
+        return 0
 
     def recibir_dano(self, dano):
-        self.__vida -= dano
-        if self.__vida < 0:
-            self.__vida = 0  # Aseguramos que la vida no sea negativa
+        self.vida -= dano
+
+    def usar_poder(self):
+        return None, 1.0
 
 class Guerrero(Personaje):
-    def __init__(self, nombre, vida, ataque, defensa):
-        super().__init__(nombre, vida, ataque, defensa)
+    def calcular_dano(self, objetivo):
+        base_dano = self.ataque * 1.2
+        return max(base_dano - objetivo.defensa, 0)
 
     def atacar(self, objetivo):
-        dano = self.ataque * 1.2
-        dano_real = max(dano - objetivo.defensa, 0)
-        objetivo.recibir_dano(dano_real)
-        print(f"{self.nombre} (Guerrero) ataca a {objetivo.nombre} con {dano_real} de daño. Vida restante de {objetivo.nombre}: {objetivo.vida}")
+        poder, mult = self.usar_poder()
+        dano = self.calcular_dano(objetivo) * mult
+        objetivo.recibir_dano(dano)
+        texto = f"{self.nombre} (Guerrero) ataca a {objetivo.nombre} con {dano:.2f} de daño."
+        if poder:
+            texto += f" ¡Usó poder: {poder}!"
+        texto += f" Vida restante: {objetivo.vida:.2f}"
+        return texto
 
+    def usar_poder(self):
+        if random.random() < 0.3:
+            poder = random.choice(["Furia", "Golpe Crítico", "Defensa Temporal"])
+            if poder == "Furia":
+                return poder, 1.5
+            elif poder == "Golpe Crítico":
+                return poder, 2.0
+            elif poder == "Defensa Temporal":
+                return poder, 1.3
+        return None, 1.0
 
 class Mago(Personaje):
-    def __init__(self, nombre, vida, ataque, defensa):
-        super().__init__(nombre, vida, ataque, defensa)
+    def calcular_dano(self, objetivo):
+        return self.ataque
 
     def atacar(self, objetivo):
-        dano = self.ataque
+        poder, mult = self.usar_poder()
+        dano = self.calcular_dano(objetivo) * mult
         objetivo.recibir_dano(dano)
-        print(f"{self.nombre} (Mago) ataca a {objetivo.nombre} con {dano} de daño (sin defensa). Vida restante de {objetivo.nombre}: {objetivo.vida}")
+        texto = f"{self.nombre} (Mago) ataca a {objetivo.nombre} con {dano:.2f} de daño (ignora defensa)."
+        if poder:
+            texto += f" ¡Usó poder: {poder}!"
+        texto += f" Vida restante: {objetivo.vida:.2f}"
+        return texto
 
+    def usar_poder(self):
+        if random.random() < 0.3:
+            poder = random.choice(["Bola de Fuego", "Escudo Mágico", "Curación"])
+            if poder == "Bola de Fuego":
+                return poder, 1.7
+            elif poder == "Escudo Mágico":
+                self.vida += 15
+                return poder, 1.0
+            elif poder == "Curación":
+                self.vida += 20
+                return poder, 1.0
+        return None, 1.0
 
 class Arquero(Personaje):
-    def __init__(self, nombre, vida, ataque, defensa):
-        super().__init__(nombre, vida, ataque, defensa)
+    def calcular_dano(self, objetivo):
+        if self.ataque > objetivo.defensa:
+            return (self.ataque - objetivo.defensa) * 2
+        else:
+            return max(self.ataque - objetivo.defensa, 0)
 
     def atacar(self, objetivo):
-        if self.ataque > objetivo.defensa:
-            dano = (self.ataque - objetivo.defensa) * 2
-        else:
-            dano = self.ataque - objetivo.defensa
+        poder, mult = self.usar_poder()
+        dano = self.calcular_dano(objetivo) * mult
         objetivo.recibir_dano(dano)
-        print(f"{self.nombre} (Arquero) ataca a {objetivo.nombre} con {dano} de daño. Vida restante de {objetivo.nombre}: {objetivo.vida}")
+        texto = f"{self.nombre} (Arquero) ataca a {objetivo.nombre} con {dano:.2f} de daño."
+        if poder:
+            texto += f" ¡Usó poder: {poder}!"
+        texto += f" Vida restante: {objetivo.vida:.2f}"
+        return texto
 
+    def usar_poder(self):
+        if random.random() < 0.3:
+            poder = random.choice(["Disparo Preciso", "Flecha Envenenada", "Evasión"])
+            if poder == "Disparo Preciso":
+                return poder, 1.8
+            elif poder == "Flecha Envenenada":
+                return poder, 1.3
+            elif poder == "Evasión":
+                self.vida += 10
+                return poder, 1.0
+        return None, 1.0
 
-def batalla(personaje1, personaje2):
-    turno = 0
-    while personaje1.vida > 0 and personaje2.vida > 0:
-        print(f"\nTurno {turno + 1}:")
-        if turno % 2 == 0:
-            personaje1.atacar(personaje2)
-        else:
-            personaje2.atacar(personaje1)
-        turno += 1
+# ------------------ Interfaz con Tkinter ------------------
 
-    if personaje1.vida > 0:
-        print(f"\n{personaje1.nombre} (Guerrero) gana la batalla con {personaje1.vida} de vida restante.")
-    else:
-        print(f"\n{personaje2.nombre} gana la batalla con {personaje2.vida} de vida restante.")
+class BatallaApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Guardians of the Ancient Kingdom")
+        self.root.geometry("650x500")
+        self.root.configure(bg="#2D4257")
 
-    print("\n¡Batalla finalizada!")
+        titulo = tk.Label(root, text="Guardians of the Ancient Kingdom", font=("Helvetica", 20, "bold"), bg="#34495E", fg="white")
+        titulo.pack(fill=tk.X, pady=10)
 
+        frame_jugadores = tk.Frame(root, bg="#2C3E50")
+        frame_jugadores.pack(pady=10)
 
-# Función para que cada jugador ingrese su personaje
-def elegir_personaje(jugador_nombre):
-    print(f"\n{jugador_nombre}, elige tu personaje:")
-    print("1. Guerrero")
-    print("2. Mago")
-    print("3. Arquero")
-    eleccion = input("Ingresa el número de tu elección (1, 2 o 3): ")
-    
-    if eleccion == "1":
-        nombre_guerrero = input(f"Ingresa el nombre de tu Guerrero, {jugador_nombre}: ")
-        return Guerrero(nombre_guerrero, 100, 30, 20)
-    elif eleccion == "2":
-        nombre_mago = input(f"Ingresa el nombre de tu Mago, {jugador_nombre}: ")
-        return Mago(nombre_mago, 80, 40, 10)
-    elif eleccion == "3":
-        nombre_arquero = input(f"Ingresa el nombre de tu Arquero, {jugador_nombre}: ")
-        return Arquero(nombre_arquero, 90, 25, 15)
-    else:
-        print("Opción no válida, elige 1, 2 o 3.")
-        return elegir_personaje(jugador_nombre)
+        # Jugador 1
+        frame_j1 = tk.LabelFrame(frame_jugadores, text="Jugador 1", font=("Helvetica", 14, "bold"), fg="#ECF0F1", bg="#34495E", padx=10, pady=10)
+        frame_j1.grid(row=0, column=0, padx=15)
 
-# Pedir al jugador los nombres
-jugador1_nombre = input("Ingresa el nombre del primer jugador: ")
-jugador2_nombre = input("Ingresa el nombre del segundo jugador: ")
-jugador3_nombre = input("Ingresa el nombre del tercer jugador: ")
+        tk.Label(frame_j1, text="Nombre:", bg="#34495E", fg="white", font=("Helvetica", 12)).grid(row=0, column=0, sticky="e", pady=5)
+        self.j1_nombre = tk.Entry(frame_j1, font=("Helvetica", 12))
+        self.j1_nombre.grid(row=0, column=1, pady=5)
 
-# Crear los personajes de los tres jugadores
-jugador1 = elegir_personaje(jugador1_nombre)
-jugador2 = elegir_personaje(jugador2_nombre)
-jugador3 = elegir_personaje(jugador3_nombre)
+        tk.Label(frame_j1, text="Clase:", bg="#34495E", fg="white", font=("Helvetica", 12)).grid(row=1, column=0, sticky="e", pady=5)
+        self.j1_clase = tk.StringVar(value="Guerrero")
+        clases_menu1 = tk.OptionMenu(frame_j1, self.j1_clase, "Guerrero", "Mago", "Arquero")
+        clases_menu1.config(font=("Helvetica", 12), bg="#2980B9", fg="white")
+        clases_menu1.grid(row=1, column=1, pady=5)
 
-# Mostrar los personajes creados
-print(f"\n{jugador1.nombre} es un {jugador1.__class__.__name__}!")
-print(f"{jugador2.nombre} es un {jugador2.__class__.__name__}!")
-print(f"{jugador3.nombre} es un {jugador3.__class__.__name__}!")
+        # Jugador 2
+        frame_j2 = tk.LabelFrame(frame_jugadores, text="Jugador 2", font=("Helvetica", 14, "bold"), fg="#ECF0F1", bg="#34495E", padx=10, pady=10)
+        frame_j2.grid(row=0, column=1, padx=15)
 
-# Iniciar las batallas entre los tres jugadores
-print(f"\n¡La batalla entre {jugador1.nombre}, {jugador2.nombre} y {jugador3.nombre} comenzará!")
+        tk.Label(frame_j2, text="Nombre:", bg="#34495E", fg="white", font=("Helvetica", 12)).grid(row=0, column=0, sticky="e", pady=5)
+        self.j2_nombre = tk.Entry(frame_j2, font=("Helvetica", 12))
+        self.j2_nombre.grid(row=0, column=1, pady=5)
 
-# Batalla entre los jugadores
-print(f"\nBatalla entre {jugador1.nombre} y {jugador2.nombre}:")
-batalla(jugador1, jugador2)
+        tk.Label(frame_j2, text="Clase:", bg="#34495E", fg="white", font=("Helvetica", 12)).grid(row=1, column=0, sticky="e", pady=5)
+        self.j2_clase = tk.StringVar(value="Guerrero")
+        clases_menu2 = tk.OptionMenu(frame_j2, self.j2_clase, "Guerrero", "Mago", "Arquero")
+        clases_menu2.config(font=("Helvetica", 12), bg="#2980B9", fg="white")
+        clases_menu2.grid(row=1, column=1, pady=5)
 
-print(f"\nBatalla entre {jugador2.nombre} y {jugador3.nombre}:")
-batalla(jugador2, jugador3)
+        self.boton_batalla = tk.Button(root, text="Iniciar Batalla", font=("Helvetica", 14, "bold"), bg="#27AE60", fg="white", command=self.iniciar_batalla)
+        self.boton_batalla.pack(pady=15)
 
-print(f"\nBatalla entre {jugador1.nombre} y {jugador3.nombre}:")
-batalla(jugador1, jugador3)
+        frame_resultado = tk.Frame(root)
+        frame_resultado.pack(padx=20, pady=10, fill=tk.BOTH, expand=True)
+
+        self.resultado_texto = tk.Text(frame_resultado, height=15, width=75, font=("Courier", 12), bg="#1A252F", fg="#ECF0F1", wrap=tk.WORD)
+        self.resultado_texto.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        scrollbar = tk.Scrollbar(frame_resultado, command=self.resultado_texto.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.resultado_texto.config(yscrollcommand=scrollbar.set)
+
+    def crear_personaje(self, nombre, clase):
+        if clase == "Guerrero":
+            return Guerrero(nombre, 100, 30, 20)
+        elif clase == "Mago":
+            return Mago(nombre, 80, 40, 10)
+        elif clase == "Arquero":
+            return Arquero(nombre, 90, 25, 15)
+
+    def iniciar_batalla(self):
+        nombre1 = self.j1_nombre.get()
+        clase1 = self.j1_clase.get()
+        nombre2 = self.j2_nombre.get()
+        clase2 = self.j2_clase.get()
+
+        if not nombre1 or not nombre2:
+            messagebox.showwarning("Error", "Por favor ingresa nombres para ambos jugadores.")
+            return
+
+        self.jugador1 = self.crear_personaje(nombre1, clase1)
+        self.jugador2 = self.crear_personaje(nombre2, clase2)
+
+        self.resultado_texto.delete("1.0", tk.END)
+        self.resultado_texto.insert(tk.END, f"Comienza la batalla entre {nombre1} ({clase1}) y {nombre2} ({clase2})\n\n")
+
+        turno = 0
+        while self.jugador1.vida > 0 and self.jugador2.vida > 0:
+            if turno % 2 == 0:
+                resultado = self.jugador1.atacar(self.jugador2)
+            else:
+                resultado = self.jugador2.atacar(self.jugador1)
+            self.resultado_texto.insert(tk.END, resultado + "\n")
+            self.resultado_texto.see(tk.END)
+            self.root.update()
+            turno += 1
+
+        ganador = self.jugador1 if self.jugador1.vida > 0 else self.jugador2
+        self.resultado_texto.insert(tk.END, f"\n¡{ganador.nombre} gana la batalla!\n")
+
+# ------------------ Ejecutar la App ------------------
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = BatallaApp(root)
+    root.mainloop()
