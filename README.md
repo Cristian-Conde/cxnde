@@ -222,3 +222,115 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = BatallaApp(root)
     root.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
+# ------------------ 📘 Documentación del juego: Guardians of the Ancient Kingdom-----------------
+
+
+1. Información general
+Nombre del proyecto: Guardians of the Ancient Kingdom
+Lenguaje: Python 3
+Interfaz gráfica: Tkinter
+Estilo de juego: Juego por turnos (tipo RPG básico)
+Objetivo: Simular una batalla entre dos personajes con distintas clases y habilidades especiales.
+
+2. Descripción del juego
+Guardians of the Ancient Kingdom es un juego por turnos donde dos jugadores eligen una clase (Guerrero, Mago o Arquero) y compiten en una batalla usando ataques y poderes únicos. Cada clase tiene sus propias estadísticas y habilidades especiales que se activan de forma aleatoria durante la pelea.
+
+3. Clases de personajes
+🛡️ Guerrero
+Vida: 100
+
+Ataque: 30
+
+Defensa: 20
+
+Estilo: Lucha cuerpo a cuerpo
+
+Poderes posibles:
+
+Furia: Aumenta el daño en 1.5×
+
+Golpe Crítico: Aumenta el daño en 2.0×
+
+Defensa Temporal: Aumenta el daño en 1.3×
+
+🔮 Mago
+Vida: 80
+
+Ataque: 40
+
+Defensa: 10
+
+Estilo: Magia a distancia (ignora defensa del oponente)
+
+Poderes posibles:
+
+Bola de Fuego: Aumenta el daño en 1.7×
+
+Escudo Mágico: Recupera 15 de vida
+
+Curación: Recupera 20 de vida
+
+🏹 Arquero
+Vida: 90
+
+Ataque: 25
+
+Defensa: 15
+
+Estilo: Combate a distancia con daño doble si supera la defensa
+
+Poderes posibles:
+
+Disparo Preciso: Aumenta el daño en 1.8×
+
+Flecha Envenenada: Aumenta el daño en 1.3×
+
+Evasión: Recupera 10 de vida
+
+4. Mecánica de juego
+Ambos jugadores eligen nombre y clase.
+
+Cada turno, un jugador ataca al otro.
+
+Se calcula el daño considerando el ataque, defensa y el uso (o no) de un poder especial.
+
+Los turnos se alternan hasta que uno de los jugadores llega a 0 de vida.
+
+Se muestra el registro de los ataques y el ganador final en un cuadro de texto.
+
+5. Interfaz gráfica
+La interfaz se construye con Tkinter e incluye:
+
+Entradas para el nombre de cada jugador.
+
+Menús desplegables para seleccionar la clase.
+
+Botón de iniciar batalla.
+
+Panel de resultados tipo consola para ver los ataques y el resultado de la batalla.
+
+6. Código fuente y estructura
+Personaje: Clase base con atributos comunes.
+
+Guerrero, Mago, Arquero: Heredan de Personaje y definen su estilo de combate.
+
+BatallaApp: Clase principal que contiene la interfaz, lógica de creación de personajes y turnos de ataque.
+
+7. Requisitos
+Python 3.x instalado
+
+No se requieren librerías externas (Tkinter viene incluido)
+
+
