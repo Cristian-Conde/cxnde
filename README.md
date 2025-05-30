@@ -234,7 +234,7 @@ if __name__ == "__main__":
 
 
 
-# ------------------ 📘 Documentación del juego: Guardians of the Ancient Kingdom-----------------
+# ------------------ 📘 Documentación del juego-----------------
 
 
 1. Información general
